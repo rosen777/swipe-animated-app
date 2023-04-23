@@ -7,9 +7,12 @@ import {
   PanResponder,
   Animated,
   useWindowDimensions,
+  Dimensions,
+  ScrollView,
 } from "react-native";
 import Deck from "./src/components/Deck";
 import { Card, Button, Image } from "@rneui/themed";
+const screenWidth = Dimensions.get("window").width;
 
 const DATA = [
   {
@@ -151,68 +154,63 @@ export default function App() {
     </Card>
   );
 
-  const renderCard = ({ item, index }) => {
-    if (index < cardIndex) {
-      return null;
-    }
-
-    if (index === cardIndex) {
-      return (
-        <Animated.View
-          key={item.id}
-          style={getCardStyle()}
-          {...panResponder.panHandlers}>
-          <Card key={item.id}>
-            <Card.Title>{item.text}</Card.Title>
-            <Card.Image source={{ uri: item.uri }} />
-            <Text
-              style={{
-                marginBottom: 10,
-              }}>
-              I can customize the card further.
-            </Text>
-            <Button
-              icon={{ name: "code" }}
-              backgroundColor="#03A9F4"
-              title="View Now!"
-            />
-          </Card>
-        </Animated.View>
-      );
-    }
-
-    if (item) {
-      return (
-        <Card key={item.id}>
-          <Card.Title>{item.text}</Card.Title>
-          <Card.Image source={{ uri: item.uri }} />
-          <Text
-            style={{
-              marginBottom: 10,
-            }}>
-            I can customize the card further.
-          </Text>
-          <Button
-            icon={{ name: "code" }}
-            backgroundColor="#03A9F4"
-            title="View Now!"
-          />
-        </Card>
-      );
-    }
+  const renderCard = () => {
+    return cards
+      .map((item, index) => {
+        if (index < cardIndex) {
+          return null;
+        }
+        if (index === cardIndex) {
+          return (
+            <Animated.View
+              key={item.id}
+              style={[getCardStyle(), styles.cardStyle]}
+              {...panResponder.panHandlers}>
+              <Card key={item.id}>
+                <Card.Title>{item.text}</Card.Title>
+                <Card.Image source={{ uri: item.uri }} />
+                <Text
+                  style={{
+                    marginBottom: 10,
+                  }}>
+                  I can customize the card further.
+                </Text>
+                <Button
+                  icon={{ name: "code" }}
+                  backgroundColor="#03A9F4"
+                  title="View Now!"
+                />
+              </Card>
+            </Animated.View>
+          );
+        } else {
+          return (
+            <View style={styles.cardStyle}>
+              <Card key={item.id}>
+                <Card.Title>{item.text}</Card.Title>
+                <Card.Image source={{ uri: item.uri }} />
+                <Text
+                  style={{
+                    marginBottom: 10,
+                  }}>
+                  I can customize the card further.
+                </Text>
+                <Button
+                  icon={{ name: "code" }}
+                  backgroundColor="#03A9F4"
+                  title="View Now!"
+                />
+              </Card>
+            </View>
+          );
+        }
+      })
+      .reverse();
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      {cardIndex >= cards.length ? (
-        renderNoMoreCards()
-      ) : (
-        <Deck
-          data={DATA}
-          renderCard={renderCard}
-          onSwipeRight={() => console.log("something was swipped")}
-        />
-      )}
+      {cardIndex >= cards.length ? renderNoMoreCards() : renderCard()}
     </SafeAreaView>
   );
 }
@@ -221,10 +219,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    top: 60,
   },
   item: {
     aspectRatio: 1,
     width: "100%",
     flex: 1,
+  },
+  cardStyle: {
+    position: "absolute",
+    width: screenWidth,
   },
 });

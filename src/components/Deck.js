@@ -5,7 +5,10 @@ import {
   FlatList,
   PanResponder,
   Animated,
+  Dimensions,
 } from "react-native";
+
+const screenWidth = Dimensions.get("window").width;
 
 const Deck = ({ data, renderCard }) => {
   const [cards, setCards] = useState([]);
@@ -40,17 +43,23 @@ const Deck = ({ data, renderCard }) => {
   useEffect(() => {
     setCards(data);
   }, [cards]);
-  const renderCards = () => (
-    <FlatList
-      data={cards}
-      renderItem={renderCard}
-      keyExtractor={(item) => item.id}
-    />
-  );
+  const renderCards = () => {
+    return (
+      <FlatList
+        data={cards}
+        renderItem={renderCard}
+        keyExtractor={(item) => item.id}
+      />
+    );
+  };
 
-  return <View>{renderCards()}</View>;
+  return renderCards();
 };
 
 export default Deck;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  cardStyle: {
+    maxWidth: screenWidth,
+  },
+});
