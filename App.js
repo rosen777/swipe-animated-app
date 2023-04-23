@@ -210,7 +210,9 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {cardIndex >= cards.length ? renderNoMoreCards() : renderCard()}
+      <View>
+        {cardIndex >= cards.length ? renderNoMoreCards() : renderCard()}
+      </View>
     </SafeAreaView>
   );
 }
@@ -219,7 +221,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    top: 60,
   },
   item: {
     aspectRatio: 1,
