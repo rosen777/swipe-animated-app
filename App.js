@@ -3,6 +3,7 @@ import {
   StyleSheet,
   Text,
   View,
+  SafeAreaView,
   PanResponder,
   Animated,
   useWindowDimensions,
@@ -138,6 +139,18 @@ export default function App() {
     };
   };
 
+  const renderNoMoreCards = () => (
+    <Card title="All Done!">
+      <Text
+        style={{
+          marginBottom: 10,
+        }}>
+        There's no more content here!
+      </Text>
+      <Button backgroundColor="#03A9F4" title="Get more!" />
+    </Card>
+  );
+
   const renderCard = ({ item, index }) => {
     if (index < cardIndex) {
       return null;
@@ -190,13 +203,17 @@ export default function App() {
   };
 
   return (
-    <View style={styles.container}>
-      <Deck
-        data={DATA}
-        renderCard={renderCard}
-        onSwipeRight={() => console.log("something was swipped")}
-      />
-    </View>
+    <SafeAreaView style={styles.container}>
+      {cardIndex >= cards.length ? (
+        renderNoMoreCards()
+      ) : (
+        <Deck
+          data={DATA}
+          renderCard={renderCard}
+          onSwipeRight={() => console.log("something was swipped")}
+        />
+      )}
+    </SafeAreaView>
   );
 }
 
