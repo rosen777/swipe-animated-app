@@ -20,9 +20,20 @@ const Deck = ({ data, renderCard }) => {
           y: gesture.dy,
         });
       },
-      onPanResponderRelease: () => {},
+      onPanResponderRelease: () => {
+        resetPosition();
+      },
     })
   ).current;
+
+  const resetPosition = () => {
+    Animated.spring(position, {
+      toValue: {
+        x: 0,
+        y: 0,
+      },
+    }).start();
+  };
 
   useEffect(() => {}, []);
 

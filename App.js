@@ -55,8 +55,12 @@ const DATA = [
 
 export default function App() {
   const [cards, setCards] = useState([]);
+  const [cardIndex, setCardIndex] = useState(0);
+
   const position = useRef(new Animated.ValueXY()).current;
   const { height, width } = useWindowDimensions();
+  const swipeThreshold = 0.25 * width;
+  const swipeOutDuration = 250;
 
   const panResponder = useRef(
     PanResponder.create({
@@ -67,9 +71,52 @@ export default function App() {
           y: gesture.dy,
         });
       },
-      onPanResponderRelease: () => {},
+      onPanResponderRelease: (event, gesture) => {
+        if (gesture.dx > swipeThreshold) {
+          forceSwipe("right");
+        } else if (gesture.dx < -swipeThreshold) {
+          forceSwipe("left");
+        } else {
+          resetPosition();
+        }
+      },
     })
   ).current;
+
+  const forceSwipe = (direction) => {
+    const x = direction === "right" ? width : -width;
+    Animated.timing(position, {
+      toValue: {
+        x,
+        y: 0,
+      },
+      duration: swipeOutDuration,
+    }).start(() => onSwipeComplete(direction));
+  };
+
+  const onSwipeLeft = () => {};
+
+  const onSwipeRight = () => {};
+
+  const onSwipeComplete = (direction) => {
+    const item = cards[cardIndex];
+
+    direction === "right" ? onSwipeRight(item) : onSwipeLeft(item);
+    position.setValue({
+      x: 0,
+      y: 0,
+    });
+    setCardIndex((cardIndex) => cardIndex + 1);
+  };
+
+  const resetPosition = () => {
+    Animated.spring(position, {
+      toValue: {
+        x: 0,
+        y: 0,
+      },
+    }).start();
+  };
 
   useEffect(() => {
     setCards(DATA);
@@ -92,21 +139,23 @@ export default function App() {
   };
 
   const renderCard = ({ item, index }) => {
-    if (index === 0) {
+    if (index < cardIndex) {
+      return null;
+    }
+
+    if (index === cardIndex) {
       return (
         <Animated.View
           key={item.id}
           style={getCardStyle()}
-          {...panResponder.panHandlers}
-        >
+          {...panResponder.panHandlers}>
           <Card key={item.id}>
             <Card.Title>{item.text}</Card.Title>
             <Card.Image source={{ uri: item.uri }} />
             <Text
               style={{
                 marginBottom: 10,
-              }}
-            >
+              }}>
               I can customize the card further.
             </Text>
             <Button
@@ -127,8 +176,7 @@ export default function App() {
           <Text
             style={{
               marginBottom: 10,
-            }}
-          >
+            }}>
             I can customize the card further.
           </Text>
           <Button
@@ -143,7 +191,11 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Deck data={DATA} renderCard={renderCard} />
+      <Deck
+        data={DATA}
+        renderCard={renderCard}
+        onSwipeRight={() => console.log("something was swipped")}
+      />
     </View>
   );
 }
